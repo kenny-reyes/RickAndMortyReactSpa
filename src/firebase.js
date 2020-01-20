@@ -14,6 +14,10 @@ var firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
+export function signOutGoogle() {
+  firebase.auth().signOut();
+}
+
 export function logWithGoogle() {
   let provider = new firebase.auth.GoogleAuthProvider();
   return firebase
