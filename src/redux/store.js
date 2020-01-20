@@ -4,8 +4,8 @@ import charsReducer, { getCharactersAction } from "./charsDuck";
 import thunk from "redux-thunk";
 
 let rootReducer = combineReducers({
-  user: userReducer,
-  character: charsReducer
+  users: userReducer,
+  characters: charsReducer
 });
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
@@ -16,7 +16,6 @@ export default function genareteStore() {
     composeEnhancers(applyMiddleware(thunk))
   );
   // Get the characters the first time
-
   getCharactersAction()(store.dispatch, store.getState);
   return store;
 }
