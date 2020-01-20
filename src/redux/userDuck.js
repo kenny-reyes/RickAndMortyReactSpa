@@ -28,6 +28,17 @@ function saveStorage(storage) {
   localStorage.storage = JSON.stringify(storage);
 }
 
+export let restoreSessionAction = () => dispatch => {
+  let storage = localStorage.getItem("storage");
+  storage = JSON.parse(storage);
+  if (storage && storage.users) {
+    dispatch({
+      type: LOGIN_SUCCESS,
+      payload: storage.users
+    });
+  }
+};
+
 // actions or actions creator
 export let doGoogleLogAction = () => (dispatch, getState) => {
   dispatch({
