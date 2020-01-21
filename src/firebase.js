@@ -1,5 +1,6 @@
 import firebase from "firebase/app";
 import "firebase/auth";
+import "firebase/firestore";
 
 var firebaseConfig = {
   apiKey: "AIzaSyB8Mz6oe9DjTrP9vey9CXgErOlk3uWQbL4",
@@ -16,6 +17,22 @@ firebase.initializeApp(firebaseConfig);
 
 export function signOutGoogle() {
   firebase.auth().signOut();
+}
+
+let db = firebase.firestore().collection("favs");
+
+export function getFavorites(uid) {
+  return db
+    .doc(uid)
+    .get()
+    .then(snapshot => {
+      return snapshot.data().array;
+    });
+}
+
+export function updateDB(array, uid) {
+  // in the document of the user we'll save the favorites
+  return db.doc(uid).set({ array });
 }
 
 export function logWithGoogle() {

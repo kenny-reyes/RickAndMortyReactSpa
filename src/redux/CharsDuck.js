@@ -1,5 +1,5 @@
 import axios from "axios";
-
+import { updateDB, getFavorites } from "../firebase";
 // Constants
 let initialData = {
   fetching: false,
@@ -15,6 +15,10 @@ let GET_CHARACTERS_ERROR = "GET_CHARACTERS_ERROR";
 let REMOVE_CHARACTER = "REMOVE_CHARACTER";
 let ADD_TO_FAVORITE = "ADD_TO_FAVORITE";
 
+let GET_FAVORITES = "GET_FAVORITES";
+let GET_FAVORITES_SUCCESS = "GET_FAVORITES_SUCCESS";
+let GET_FAVORITES_ERROR = "GET_FAVORITES_ERROR";
+
 // Reducers
 export default function reducer(state = initialData, action) {
   switch (action.type) {
@@ -24,7 +28,7 @@ export default function reducer(state = initialData, action) {
     case GET_CHARACTERS:
       return { ...state, fetching: true };
     case GET_CHARACTERS_ERROR:
-      return { ...state, fetching: false, error: action.payload };
+      return { ...state, error: action.payload, fetching: false };
     case GET_CHARACTERS_SUCCESS:
       return { ...state, array: action.payload, fetching: false };
     case ADD_TO_FAVORITE:
@@ -34,6 +38,12 @@ export default function reducer(state = initialData, action) {
         favorites: action.payload.favorites,
         fetching: false
       };
+    case GET_FAVORITES:
+      return { ...state, fetching: true };
+    case GET_FAVORITES_SUCCESS:
+      return { ...state, favorites: action.payload, fetching: false };
+    case GET_FAVORITES_ERROR:
+      return { ...state, error: action.payload, fetching: false };
     default:
       return state;
   }
@@ -42,8 +52,10 @@ export default function reducer(state = initialData, action) {
 // Action (o thunk)
 export const addToFavoritesAction = () => (dispatch, getState) => {
   let { array, favorites } = getState().characters;
+  let { uid } = getState().users;
   let character = array.shift();
   favorites.push(character);
+  updateDB(favorites, uid);
   dispatch({
     type: ADD_TO_FAVORITE,
     payload: { array: [...array], favorites: [...favorites] }
@@ -58,6 +70,28 @@ export const removeCharactersAction = () => (dispatch, getState) => {
     type: REMOVE_CHARACTER,
     payload: [...array]
   });
+};
+
+// Action (o thunk)
+export const retrieveFavorites = () => (dispatch, getState) => {
+  dispatch({
+    type: GET_FAVORITES
+  });
+  let { uid } = getState().users;
+  return getFavorites(uid)
+    .then(array => {
+      dispatch({
+        type: GET_FAVORITES_SUCCESS,
+        payload: [...array]
+      });
+    })
+    .catch(e => {
+      console.log(e);
+      dispatch({
+        type: GET_FAVORITES_ERROR,
+        payload: e.message
+      });
+    });
 };
 
 // Action (o thunk)

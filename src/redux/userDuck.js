@@ -1,5 +1,5 @@
 import { logWithGoogle, signOutGoogle } from "../firebase";
-
+import { retrieveFavorites } from "./charsDuck";
 // constants
 let initialData = {
   loggedIn: false,
@@ -68,6 +68,7 @@ export let doGoogleLogAction = () => (dispatch, getState) => {
         }
       });
       saveStorage(getState());
+      retrieveFavorites()(dispatch, getState);
     })
     .catch(e => {
       console.log(e);
